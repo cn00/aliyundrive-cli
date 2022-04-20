@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	_ "database/sql"
-	"fmt"
 	"github.com/chyroc/go-aliyundrive"
 	_ "github.com/mattn/go-sqlite3"
 	"strings"
@@ -31,33 +30,36 @@ func (r *CommandUniq) uniq() {
 	query, err := r.db.Query(sqls)
 
 	if err != nil {
-		println(err.Error())
+		println("db.Query err:", err.Error())
 	}
 	var rows []ItemView
 	for query.Next() {
 		row := ItemView{}
 		query.Scan(&row.id, &row.name, &row.file_ids, &row.c, &row.size, &row.hash)
-		fmt.Printf("%+v\n\n", row)
+		//fmt.Printf("query.Scan: %+v\n\n", row)
 		rows = append(rows, row)
 	}
 	query.Close()
 
-	stmt, err := r.db.Prepare(`update item set flag = 0 where file_id = ?`)
+	stmt, err := r.db.Prepare(`update item set flag = 0 where file_id in (?)`)
+	var batch []string
 	for _, row := range rows {
 		file_ids := strings.Split(row.file_ids, ",")
-		for i := 1; i < len(file_ids); i++ {
-			_, err = r.cli.ali.File.DeleteFile(context.Background(), &aliyundrive.DeleteFileReq{
-				DriveID: r.cli.driveID,
-				FileID:  file_ids[i],
-			})
-			if err == nil {
-				_, err = stmt.Exec(file_ids[i])
-				println("delete " + row.name + file_ids[i])
-				if err != nil {
-					println("upate flag err:" + err.Error())
-				}
-			}
+		batch = append(batch, file_ids[1:]...)
+		if len(batch) < 200 {
+			continue
 		}
+		r.cli.ali.File.Batch(context.Background(), aliyundrive.BatchDelete, r.cli.driveID, batch)
+		batchs := strings.Join(batch, ",")
+		_, err = stmt.Exec(batchs)
+		//for i := 1; i < len(batch); i++ {
+		//	_, err = stmt.Exec(batch[i])
+		println("delete " + batchs + " == " + row.file_ids)
+		if err != nil {
+			println("upate flag err:" + err.Error())
+		}
+		//}
+		batch = make([]string, 1)
 	}
 }
 
