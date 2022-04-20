@@ -56,6 +56,23 @@ func (r *CommandDump) Run() (err error) {
 	r.db, err = sql.Open("sqlite3", "/Users/cn/ws/aliyundrive-cli/aliyundrive.db")
 	checkErr(err)
 
+	// init table
+	r.db.Exec(`create table if not exists item 
+		(
+			id   integer not null
+				constraint item_pk primary key autoincrement,
+			p_id integer,
+			type int,
+			name text,
+			size int,
+			url  text,
+			hash text,
+			constraint item_pk_2 unique (p_id, name)
+		);
+		
+		create unique index item_id_uindex on item (id);
+		`)
+
 	//r.cli.PrintFiles(r.cli.files)
 	stmt, err := r.db.Prepare("INSERT INTO item(name, type, size, url, p_id, hash, surfix, file_id) values(?,?,?,?,?,?,?,?)")
 	checkErr(err)
