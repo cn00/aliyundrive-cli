@@ -12,19 +12,20 @@ type Command interface {
 
 const CommandUsage = `
 Only support the follow sub command:
-	1. cd            chdir
-	2. ls            list files
-	3. mkdir         create directory
-	4. rm            remove file or directory
-	5. upload        upload file
-	6. download      download file
-	7. mv            file or directory
-	8. rename        rename file or directory
-	9. 2tv           send video to tv
-	10. help or ?    print help usage
-	11. exit         exit program
-	12. dump         dump file tree
-	13. uniq         uniq files
+	2tv      	 send video to tv
+	cd       	 chdir
+	download 	 download file
+	dump     	 dump all file info to sqlite
+	exit     	 exit program
+	find     	 find by file id
+	help or ?	 print help usage
+	ls       	 list files
+	mkdir    	 create directory
+	mv       	 file or directory
+	rename   	 rename file or directory
+	rm       	 remove file or directory
+	uniq     	 uniq files
+	upload   	 upload file
 `
 
 func (r *Cli) ParseCommand(input string) (Command, error) {
@@ -46,6 +47,9 @@ func (r *Cli) ParseCommand(input string) (Command, error) {
 	}
 	if strings.HasPrefix(input, "uniq") {
 		return &CommandUniq{cli: r}, nil
+	}
+	if strings.HasPrefix(input, "find") {
+		return &CommandFind{cli: r, fileID: strings.TrimSpace(input[len("find "):])}, nil
 	}
 	if strings.HasPrefix(input, "mkdir ") {
 		return &CommandMkdir{cli: r, dir: strings.TrimSpace(input[len("mkdir "):])}, nil
