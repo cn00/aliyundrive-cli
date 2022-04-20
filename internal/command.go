@@ -23,6 +23,8 @@ Only support the follow sub command:
 	9. 2tv           send video to tv
 	10. help or ?    print help usage
 	11. exit         exit program
+	12. dump         dump file tree
+	13. uniq         uniq files
 `
 
 func (r *Cli) ParseCommand(input string) (Command, error) {
@@ -38,6 +40,12 @@ func (r *Cli) ParseCommand(input string) (Command, error) {
 	}
 	if strings.HasPrefix(input, "cd ") {
 		return &CommandCd{cli: r, dir: strings.TrimSpace(input[len("cd "):])}, nil
+	}
+	if strings.HasPrefix(input, "dump") {
+		return &CommandDump{cli: r}, nil
+	}
+	if strings.HasPrefix(input, "uniq") {
+		return &CommandUniq{cli: r}, nil
 	}
 	if strings.HasPrefix(input, "mkdir ") {
 		return &CommandMkdir{cli: r, dir: strings.TrimSpace(input[len("mkdir "):])}, nil
