@@ -15,6 +15,8 @@ require (
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
 )
 
+replace github.com/chyroc/go-aliyundrive => ./go-aliyundrive
+
 require (
 	github.com/chyroc/gorequests v0.32.0 // indirect
 	github.com/chyroc/persistent-cookiejar v0.1.0 // indirect

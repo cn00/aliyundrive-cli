@@ -1,0 +1,3 @@
+[submodule "go-aliyundrive"]
+	path = go-aliyundrive
+	url = git@github.com:cn00/go-aliyundrive.git

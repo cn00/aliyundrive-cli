@@ -9,6 +9,7 @@ import (
 
 	"github.com/c-bata/go-prompt"
 	"github.com/chyroc/aliyundrive-cli/internal"
+	_ "github.com/mattn/go-isatty"
 )
 
 var (
