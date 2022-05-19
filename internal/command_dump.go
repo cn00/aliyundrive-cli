@@ -61,20 +61,21 @@ func (r *CommandDump) Run() (err error) {
 		(
 			id   integer not null
 				constraint item_pk primary key autoincrement,
-			p_id integer,
+			pid integer, -- parent id
 			type int,
 			name text,
 			size int,
 			url  text,
 			hash text,
-			constraint item_pk_2 unique (p_id, name)
+			fid text, -- file_id
+			constraint item_pk_2 unique (pid, name)
 		);
 		
 		create unique index item_id_uindex on item (id);
-		`)
+	`)
 
 	//r.cli.PrintFiles(r.cli.files)
-	stmt, err := r.db.Prepare("INSERT INTO item(name, type, size, url, p_id, hash, surfix, file_id) values(?,?,?,?,?,?,?,?)")
+	stmt, err := r.db.Prepare("INSERT INTO item(name, type, size, url, pid, hash, surfix, fid) values(?,?,?,?,?,?,?,?)")
 	checkErr(err)
 	for _, v := range r.cli.files {
 		r.doOnDir(v, 0, stmt)
@@ -82,3 +83,5 @@ func (r *CommandDump) Run() (err error) {
 	defer r.db.Close()
 	return nil
 }
+
+
